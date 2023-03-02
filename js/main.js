@@ -1,10 +1,76 @@
-var area = document.getElementById('area');
-var el = document.getElementsByClassName('el');
-var currentPlayer = document.getElementById('curPlyr');
-var but = document.getElementsByClassName('but');
+const area = document.getElementById('area');
+const el = document.getElementsByClassName('el');
+const currentPlayer = document.getElementById('curPlyr');
+const but = document.getElementsByClassName('but');
 
 
 let player = "x";
+
+const PLAYER1       = "x";
+const PLAYER2       = "o";
+const WIN_VALUE     = 100;
+const LOSS_VALUE    = -WIN_VALUE;
+const DRAW_VALUE    = 0;
+
+// 9 spaces
+const initialPosition = "000000000";
+const boardSize = Number.parseInt(Math.sqrt(initialPosition.length));
+
+/**
+ * switch player after move
+ * @param {string} player 
+ * @returns 
+ */
+function switchPlayer(player) {
+    if(player == PLAYER1) {
+        return PLAYER2;
+    }
+    return PLAYER1;
+}
+
+/**
+ * Структура, представляющая позицию. Запоминает текущую позицию и очередь хода.
+ * @param {string} board
+ * @param {string} player 
+ */
+class Position{
+    constructor(board, player) {
+        this.board = board;
+        this.player = player;
+    }
+    /**
+     * создаем дочерние позиции, проставляя сивол игрока на пустые ячейки.
+     * пример: для позиции (xoxxo0o00, x) => [(xoxxoxo00, o), (xoxxo0ox0, o), (xoxxo0o0x, o)]
+     * @returns 
+     */
+    generateChildrens() {
+        let result = [];
+        for(i = 0; i < this.board.length; ++i) {
+            if(this.board[i] == ' ') {
+                let pos = this.board.substring(0, i) + this.player + this.board.substring(i+1);
+                result[result.length] = new Position(pos, switchPlayer(this.player));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Отрисовываем текущую позицию
+     */
+    draw() {
+        for (let i = 0; i < boardSize; i++) {
+            for (let j = 0; j < boardSize; j++) {
+                let symbol = this.board.charAt(i * boardSize + j) == "0" ? " " : this.board.charAt(i * boardSize + j);
+                area.innerHTML += "<div class='el' id=" + i + j + ">" + symbol + "</div>";
+            }
+        }
+    }
+}
+
+let initPos = new Position(initialPosition, PLAYER1);
+initPos.draw();
+
+console.log(initPos.generateChildrens());
 
 let data = {
     '00': " ",
@@ -18,11 +84,11 @@ let data = {
     '22': " "
 };
 
-for (var i = 0; i < 3; i++) {
-	for (var j = 0; j < 3; j++) {
-		area.innerHTML += "<div class='el' id=" + i + j + "></div>";
-	}
-}
+//for (let i = 0; i < 3; i++) {
+//    for (let j = 0; j < 3; j++) {
+//        area.innerHTML += "<div class='el' id=" + i + j + "></div>";
+//    }
+//}
 
 
 for (var i = 0; i < but.length; i++) {
@@ -41,7 +107,7 @@ function choise() {
             if (player == "x") {
                 alert('Ходит компьютер');
             }
-            
+
             break;
         case 'Компьютер с компьютером':
             console.log('Компьютер с компьютером');
@@ -65,7 +131,7 @@ function elClick() {
         alert("Ячейка занята");
         return;
     }
-    
+
     if (checkWin() == "10" || checkWin() == "-10") {
         alert("Выграл: " + player);
     } else {
@@ -131,9 +197,35 @@ function restart() {
     }
     for (var i = 0; i < 3; i++) {
         for (var j = 0; j < 3; j++) {
-            data[i+ "" +j] = " ";
+            data[i + "" + j] = " ";
         }
     }
     player = "x";
     currentPlayer.innerHTML = player.toUpperCase();
+}
+
+/*
+ * стандартная позиция минимакса
+ */
+function minimax(node, depth, maximizingPlayer){
+    let value = DRAW_VALUE;
+    if (depth == 0 || checkWin() != 0) {
+        return  value; // the heuristic value of node
+    }
+    if (maximizingPlayer) {
+        value = LOSS_VALUE;
+        let childrens = node.generateChildrens();
+        for(let child of childrens) {
+            value = max(value, minimax(child, depth - 1, FALSE));
+        }
+        return value;
+    }
+    else { //(* minimizing player *)
+        value = WIN_VALUE;
+        let childrens = node.generateChildrens();
+        for(let child of childrens) {
+            value = min(value, minimax(child, depth - 1, TRUE))
+        }
+        return value;
+    }
 }
