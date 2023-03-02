@@ -1,0 +1,56 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+.content {
+	margin: 100px 50px 50px 50px;
+	font-family: sans-serif;
+}
+
+button {
+	margin: 10px 10px;
+	margin-left: 42%;
+	border: none;
+	border-radius: 10px;
+	padding: 10px 25px;
+	background: #8eeac2;
+	cursor: pointer;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: blue;
+}
+button:hover {
+	background: #87bddc;
+}
+
+#area {
+	width: 156px;
+	border: 1px solid #ffff;
+	margin: 0 auto;
+	font-size: 0;
+}
+
+.el {
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	display: inline-block;
+	font-size: 26px;
+	border: 1px solid #000;
+	cursor: pointer;
+	vertical-align: middle;
+	transition: background .1s;
+}
+
+	.el:hover {
+		background-color: #8eeac2;
+	}
+
+.currentPlayer {
+	width: 140px;
+	font-size: 18px;
+	display: flex;
+	align-items: center;
+}
